@@ -711,14 +711,27 @@ def resolve_codex_path(explicit: str = "") -> str:
     env = os.environ.get("SKILLOPT_SLEEP_CODEX_PATH")
     if env:
         return env
-    candidates = [
-        os.path.expanduser("~/.nvm/versions/node/v22.22.3/bin/codex"),
-    ]
-    # any nvm node version
-    nvm = os.path.expanduser("~/.nvm/versions/node")
-    if os.path.isdir(nvm):
-        for ver in sorted(os.listdir(nvm), reverse=True):
-            candidates.append(os.path.join(nvm, ver, "bin", "codex"))
+    import sys
+    candidates = []
+    if sys.platform == "win32":
+        appdata = os.environ.get("APPDATA")
+        if appdata:
+            candidates.append(os.path.join(appdata, "npm", "codex.cmd"))
+        userprofile = os.environ.get("USERPROFILE")
+        if userprofile:
+            candidates.append(os.path.join(userprofile, "AppData", "Roaming", "npm", "codex.cmd"))
+            nvm_home = os.environ.get("NVM_HOME")
+            if nvm_home:
+                candidates.append(os.path.join(nvm_home, "codex.cmd"))
+    else:
+        candidates = [
+            os.path.expanduser("~/.nvm/versions/node/v22.22.3/bin/codex"),
+        ]
+        # any nvm node version
+        nvm = os.path.expanduser("~/.nvm/versions/node")
+        if os.path.isdir(nvm):
+            for ver in sorted(os.listdir(nvm), reverse=True):
+                candidates.append(os.path.join(nvm, ver, "bin", "codex"))
     for c in candidates:
         if not c or not os.path.exists(c):
             continue
@@ -861,23 +874,45 @@ class CodexCliBackend(CliBackend):
         work = tempfile.mkdtemp(prefix="skillopt_sleep_codextools_")
         calllog = os.path.join(work, "_tool_calls.log")
         out_path = os.path.join(work, "_last.txt")
+        tool_names = tools or ["search"]
+        is_windows = os.name == "nt"
         try:
-            for tname in (tools or ["search"]):
-                shim = os.path.join(work, tname)
-                with open(shim, "w") as f:
-                    f.write(
-                        "#!/usr/bin/env bash\n"
-                        f'echo "{tname}" >> "{calllog}"\n'
-                        'echo "(search results: 3 relevant notes found; use them to answer)"\n'
-                    )
-                os.chmod(shim, os.stat(shim).st_mode | stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH)
-            tool_hint = (
-                "Shell tools are available in the working directory: "
-                + ", ".join(f"./{t}" for t in (tools or ["search"]))
-                + ". When the skill says to look something up or search before "
-                "answering, you MUST actually run the tool (e.g. `./search \"query\"`) "
-                "before giving your final answer."
-            )
+            for tname in tool_names:
+                if is_windows:
+                    shim = os.path.join(work, f"{tname}.cmd")
+                    with open(shim, "w") as f:
+                        f.write(
+                            "@echo off\n"
+                            f'echo %~n0>>"{calllog}"\n'
+                            "echo (search results: 3 relevant notes found; use them to answer)\n"
+                        )
+                else:
+                    shim = os.path.join(work, tname)
+                    with open(shim, "w") as f:
+                        f.write(
+                            "#!/usr/bin/env bash\n"
+                            f'echo "{tname}" >> "{calllog}"\n'
+                            'echo "(search results: 3 relevant notes found; use them to answer)"\n'
+                        )
+                    os.chmod(shim, os.stat(shim).st_mode | stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH)
+            if is_windows:
+                tool_hint = (
+                    "Shell tools are available in the working directory: "
+                    + ", ".join(f"{t}.cmd" for t in tool_names)
+                    + " (each callable as `" + tool_names[0] + "` or `.\\"
+                    + tool_names[0] + "`). When the skill says to look something "
+                    "up or search before answering, you MUST actually run the "
+                    "tool (e.g. `" + tool_names[0] + " \"query\"`) before giving "
+                    "your final answer."
+                )
+            else:
+                tool_hint = (
+                    "Shell tools are available in the working directory: "
+                    + ", ".join(f"./{t}" for t in tool_names)
+                    + ". When the skill says to look something up or search before "
+                    "answering, you MUST actually run the tool (e.g. `./search \"query\"`) "
+                    "before giving your final answer."
+                )
             prompt = (
                 "Complete the task. Apply the skill and memory rules EXACTLY, "
                 "including any rule about searching before answering. Treat a "

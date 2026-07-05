@@ -71,6 +71,8 @@ def _runner_cmd(project: str, backend: str, extra: str, python: str) -> str:
     # use absolute python + -m so cron's minimal env still works
     cmd = (f'{python} -m skillopt_sleep run --project "{project}" '
            f'--scope invoked --backend {backend} {extra}'.rstrip())
+    if sys.platform == "win32":
+        return f'if not exist "{logdir}" mkdir "{logdir}" && cd /d "{_repo_root()}" && {cmd} >> "{log}" 2>&1'
     return f'mkdir -p "{logdir}"; cd "{_repo_root()}" && {cmd} >> "{log}" 2>&1'
 
 
