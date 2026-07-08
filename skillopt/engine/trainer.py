@@ -674,8 +674,10 @@ class ReflACTTrainer:
                 optimizer_backend = optimizer_backend or "claude_chat"
                 target_backend = target_backend or "claude_chat"
             elif backend in {"codex", "codex_exec"}:
-                optimizer_backend = optimizer_backend or "openai_chat"
-                target_backend = target_backend or "codex_exec"
+                if optimizer_backend in (None, "", "openai_chat"):
+                    optimizer_backend = "codex_exec"
+                if target_backend in (None, "", "openai_chat"):
+                    target_backend = "codex_exec"
             elif backend == "claude_code_exec":
                 optimizer_backend = optimizer_backend or "openai_chat"
                 target_backend = target_backend or "claude_code_exec"

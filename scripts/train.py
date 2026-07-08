@@ -438,8 +438,10 @@ def load_config(args: argparse.Namespace) -> dict:
             flat.setdefault("optimizer_backend", "claude_chat")
             flat.setdefault("target_backend", "claude_chat")
         elif backend in {"codex", "codex_exec"}:
-            flat.setdefault("optimizer_backend", "openai_chat")
-            flat.setdefault("target_backend", "codex_exec")
+            if not _has_model_override("model.optimizer_backend", "optimizer_backend"):
+                flat["optimizer_backend"] = "codex_exec"
+            if not _has_model_override("model.target_backend", "target_backend"):
+                flat["target_backend"] = "codex_exec"
         elif backend == "claude_code_exec":
             flat.setdefault("optimizer_backend", "openai_chat")
             flat.setdefault("target_backend", "claude_code_exec")

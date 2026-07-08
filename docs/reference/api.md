@@ -187,7 +187,7 @@ not via a base class subclass. Supported values (as of this writing):
 | `claude_chat` | ✓ | ✓ |
 | `qwen_chat` | ✓ | ✓ |
 | `minimax_chat` | ✓ | ✓ |
-| `codex_exec` | — | ✓ |
+| `codex_exec` | ✓ | ✓ |
 | `claude_code_exec` | — | ✓ |
 
 See `skillopt/model/backend_config.py` for the live whitelist and

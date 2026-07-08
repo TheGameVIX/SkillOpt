@@ -683,6 +683,8 @@ class TestCodexBackend(unittest.TestCase):
             self.assertEqual(kwargs["cwd"], expected_project)
             self.assertIn("-C", cmd)
             self.assertEqual(cmd[cmd.index("-C") + 1], expected_project)
+            self.assertEqual(cmd[-2:], ["--", "-"])
+            self.assertEqual(kwargs["input"], "hello")
 
     def test_codex_call_retries_transient_failure_not_silent_zero(self):
         """A transient timeout must be RETRIED, not silently returned as "" — an
@@ -807,6 +809,9 @@ class TestCodexBackend(unittest.TestCase):
                 be.attempt_with_tools(task, "", "", ["search"])
             
             self.assertEqual(len(temp_dirs), 1)
+            cmd, kwargs = calls[0]
+            self.assertEqual(cmd[-2:], ["--", "-"])
+            self.assertIn("# Task\nanswer the question", kwargs["input"])
             work_dir = temp_dirs[0]
             shim_path = os.path.join(work_dir, "search.cmd")
             try:

@@ -10,7 +10,7 @@ Complete reference for all SkillOpt configuration parameters.
 | `model.optimizer` | str | `gpt-5.5` | Optimizer model (for reflection & slow update) |
 | `model.target` | str | `gpt-5.5` | Target model (for rollout execution) |
 | `model.reasoning_effort` | str | `medium` | Reasoning effort level |
-| `model.optimizer_backend` | str | `openai_chat` | Optimizer backend: `openai_chat` / `claude_chat` / `qwen_chat` / `minimax_chat` |
+| `model.optimizer_backend` | str | `openai_chat` | Optimizer backend: `openai_chat` / `claude_chat` / `qwen_chat` / `minimax_chat` / `codex_exec` |
 | `model.target_backend` | str | `openai_chat` | Target backend: chat backends plus execution harnesses |
 | `model.qwen_chat_base_url` | str | `http://localhost:8000/v1` | Shared Qwen/vLLM OpenAI-compatible endpoint |
 | `model.qwen_chat_enable_thinking` | bool | `false` | Shared Qwen thinking flag |

@@ -320,8 +320,10 @@ def main() -> None:
             cfg.setdefault("optimizer_backend", "claude_chat")
             cfg.setdefault("target_backend", "claude_chat")
         elif backend in {"codex", "codex_exec"}:
-            cfg.setdefault("optimizer_backend", "openai_chat")
-            cfg.setdefault("target_backend", "codex_exec")
+            if not _has_model_override("model.optimizer_backend", "optimizer_backend"):
+                cfg["optimizer_backend"] = "codex_exec"
+            if not _has_model_override("model.target_backend", "target_backend"):
+                cfg["target_backend"] = "codex_exec"
         elif backend == "claude_code_exec":
             cfg.setdefault("optimizer_backend", "openai_chat")
             cfg.setdefault("target_backend", "claude_code_exec")

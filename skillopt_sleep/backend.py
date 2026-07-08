@@ -785,12 +785,13 @@ class CodexCliBackend(CliBackend):
             cmd[3:3] = ["-C", self.project_dir]
         if self.model:
             cmd += ["-m", self.model]
-        cmd += ["--", prompt]
+        cmd += ["--", "-"]
         proc = None
         try:
             try:
                 proc = subprocess.run(
                     cmd,
+                    input=prompt,
                     capture_output=True,
                     text=True,
                     timeout=self.timeout,
@@ -927,11 +928,18 @@ class CodexCliBackend(CliBackend):
             ]
             if self.model:
                 cmd += ["-m", self.model]
-            cmd += ["--", prompt]
+            cmd += ["--", "-"]
             self.last_call_error = ""
             proc = None
             try:
-                proc = subprocess.run(cmd, capture_output=True, text=True, timeout=self.timeout, cwd=work)
+                proc = subprocess.run(
+                    cmd,
+                    input=prompt,
+                    capture_output=True,
+                    text=True,
+                    timeout=self.timeout,
+                    cwd=work,
+                )
             except subprocess.TimeoutExpired:
                 self.last_call_error = f"codex exec (tools) timed out after {self.timeout}s"
             except Exception as exc:  # noqa: BLE001

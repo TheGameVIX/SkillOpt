@@ -352,7 +352,7 @@
         <div class="card"><h4>Validation gating</h4><p>Every candidate skill is scored on a held-out selection split and only accepted if it beats the current/best skill.</p></div>
         <div class="card"><h4>Slow update</h4><p>Epoch-boundary longitudinal comparison writes guidance into a protected region — momentum against forgetting. Force-injected or selection-gated.</p></div>
         <div class="card"><h4>Meta skill</h4><p>Optimizer-side memory that reflects on what worked across epochs and feeds back into reflection.</p></div>
-        <div class="card"><h4>Pluggable backends</h4><p>OpenAI / Azure OpenAI, Anthropic Claude, local Qwen (vLLM), plus Codex/Claude-Code exec backends for the target.</p></div>
+        <div class="card"><h4>Pluggable backends</h4><p>OpenAI / Azure OpenAI, Anthropic Claude, local Qwen (vLLM), plus Codex exec for optimizer and target, and Claude-Code exec for the target.</p></div>
         <div class="card"><h4>Six benchmarks</h4><p>SearchQA, DocVQA, ALFWorld, LiveMathematicianBench, SpreadsheetBench, OfficeQA — each a self-contained env module.</p></div>
         <div class="card"><h4>Auto-resume</h4><p>Every run is checkpointed step-by-step; re-running the same command continues from the last completed step.</p></div>
       </div>
@@ -727,7 +727,7 @@ PY</code></pre>
           <tr><td><code>backend</code></td><td>str</td><td class="def">azure_openai</td><td>High-level backend label for the run.</td></tr>
           <tr><td><code>optimizer</code></td><td>str</td><td class="def">gpt-5.5</td><td>Optimizer model deployment (writes skill edits).</td></tr>
           <tr><td><code>target</code></td><td>str</td><td class="def">gpt-5.5</td><td>Target model deployment (executes tasks).</td></tr>
-          <tr><td><code>optimizer_backend</code></td><td>str</td><td class="def">openai_chat</td><td>Client path for the optimizer: <code>openai_chat</code> or <code>claude_chat</code>.</td></tr>
+          <tr><td><code>optimizer_backend</code></td><td>str</td><td class="def">openai_chat</td><td>Client path for the optimizer: <code>openai_chat</code> / <code>claude_chat</code> / <code>qwen_chat</code> / <code>minimax_chat</code> / <code>codex_exec</code>.</td></tr>
           <tr><td><code>target_backend</code></td><td>str</td><td class="def">openai_chat</td><td>Client path for the target: <code>openai_chat</code> / <code>claude_chat</code> / <code>qwen_chat</code> / <code>codex_exec</code> / <code>claude_code_exec</code>.</td></tr>
           <tr><td><code>reasoning_effort</code></td><td>str</td><td class="def">medium</td><td><code>low</code> / <code>medium</code> / <code>high</code> / <code>xhigh</code> / <code>max</code> (or empty).</td></tr>
           <tr><td><code>rewrite_reasoning_effort</code></td><td>str</td><td class="def">""</td><td>Override effort for full-rewrite calls (empty = inherit).</td></tr>
@@ -738,7 +738,7 @@ PY</code></pre>
         </tbody>
       </table></div>
       <div class="note info"><span class="nh">Separate optimizer / target endpoints</span>
-        <p>Every <code>azure_openai_*</code> key also has <code>optimizer_azure_openai_*</code> and <code>target_azure_openai_*</code> variants, letting you point the optimizer and target at different Azure resources. Exec backends (<code>codex_exec</code>, <code>claude_code_exec</code>) add their own <code>codex_exec_*</code> / <code>claude_code_exec_*</code> knobs (sandbox, reasoning effort, SDK mode, etc.).</p>
+        <p>Every <code>azure_openai_*</code> key also has <code>optimizer_azure_openai_*</code> and <code>target_azure_openai_*</code> variants, letting you point the optimizer and target at different Azure resources. Exec backends add their own knobs, including <code>codex_exec_*</code> for optimizer/target Codex runs and <code>claude_code_exec_*</code> for target Claude-Code runs (sandbox, reasoning effort, SDK mode, etc.).</p>
       </div>
     </section>
 
